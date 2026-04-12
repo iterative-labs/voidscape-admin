@@ -19,7 +19,7 @@ cp .env.example .env
 
 ## Development
 
-With [voidscape-server](../voidscape-server) running and Postgres available per [`voidscape-server/dist/config.toml`](../voidscape-server/dist/config.toml):
+With [voidscape-server](../voidscape-server) running and Postgres available per [`voidscape-server/dist/config/config.toml`](../voidscape-server/dist/config/config.toml):
 
 ```bash
 npm run dev
