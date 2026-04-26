@@ -1,9 +1,5 @@
 export type UserStatus = 'active' | 'inactive'
 
-export interface AdminStats {
-  greeting_rows_total: number
-}
-
 export interface User {
   id: string
   username: string
