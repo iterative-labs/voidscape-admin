@@ -1,5 +1,10 @@
 export type UserStatus = 'active' | 'inactive'
 
+export interface AdminStats {
+  active_users_total: number
+  active_accounts_total: number
+}
+
 export interface User {
   id: string
   username: string

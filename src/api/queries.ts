@@ -1,10 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiFetch } from '@/api/client'
-import type { CreateUserInput, User } from '@/api/types'
+import type { AdminStats, CreateUserInput, User } from '@/api/types'
 
 export const queryKeys = {
+  stats: ['admin', 'stats'] as const,
   users: ['admin', 'users'] as const,
   user: (id: string) => ['admin', 'users', id] as const,
+}
+
+export function useAdminStats() {
+  return useQuery({
+    queryKey: queryKeys.stats,
+    queryFn: () => apiFetch<AdminStats>('/admin/stats'),
+  })
 }
 
 export function useUsersList(limit = 100, offset = 0) {
@@ -35,6 +43,7 @@ export function useCreateUser() {
       }),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: queryKeys.users })
+      void qc.invalidateQueries({ queryKey: queryKeys.stats })
     },
   })
 }
