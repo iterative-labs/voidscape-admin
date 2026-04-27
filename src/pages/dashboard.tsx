@@ -20,20 +20,37 @@ export function DashboardPage() {
       </div>
       <Card>
         <CardHeader>
-          <CardTitle>Greeting log</CardTitle>
-          <CardDescription>Rows in greeting_log (admin view)</CardDescription>
+          <CardTitle>Active users & accounts</CardTitle>
+          <CardDescription>
+            Rows with status active and not soft-deleted (admin view).
+          </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="grid gap-6 sm:grid-cols-2">
           {q.isLoading && (
             <p className="text-muted-foreground text-sm">Loading…</p>
           )}
           {q.isError && (
-            <p className="text-destructive text-sm">{q.error.message}</p>
+            <p className="text-destructive text-sm sm:col-span-2">
+              {q.error.message}
+            </p>
           )}
           {q.isSuccess && (
-            <p className="text-3xl font-mono tabular-nums">
-              {q.data.greeting_rows_total}
-            </p>
+            <>
+              <div>
+                <p className="text-muted-foreground text-sm">Active users</p>
+                <p className="text-3xl font-mono tabular-nums">
+                  {q.data.active_users_total}
+                </p>
+              </div>
+              <div>
+                <p className="text-muted-foreground text-sm">
+                  Active accounts
+                </p>
+                <p className="text-3xl font-mono tabular-nums">
+                  {q.data.active_accounts_total}
+                </p>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>

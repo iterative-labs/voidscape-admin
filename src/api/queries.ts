@@ -43,6 +43,7 @@ export function useCreateUser() {
       }),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: queryKeys.users })
+      void qc.invalidateQueries({ queryKey: queryKeys.stats })
     },
   })
 }
