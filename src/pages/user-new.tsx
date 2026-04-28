@@ -42,7 +42,10 @@ export function UserNewPage() {
         </p>
       </div>
       <Card className="max-w-md">
-        <form onSubmit={onSubmit}>
+        <form
+          onSubmit={onSubmit}
+          className="flex min-h-0 flex-col gap-4"
+        >
           <CardHeader>
             <CardTitle>Account</CardTitle>
             <CardDescription>Username must be unique.</CardDescription>
@@ -96,7 +99,7 @@ export function UserNewPage() {
               <p className="text-destructive text-sm">{create.error.message}</p>
             )}
           </CardContent>
-          <CardFooter className="gap-2">
+          <CardFooter className="shrink-0 gap-2">
             <Button type="submit" disabled={create.isPending}>
               {create.isPending ? 'Creating…' : 'Create'}
             </Button>
