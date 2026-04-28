@@ -4,7 +4,6 @@ import { Separator } from '@/components/ui/separator'
 const nav = [
   { to: '/', label: 'Dashboard' },
   { to: '/users', label: 'Users' },
-  { to: '/users/new', label: 'New user' },
 ]
 
 export function AppLayout() {
