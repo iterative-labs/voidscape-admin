@@ -1,6 +1,6 @@
 # Voidscape Admin
 
-Internal React SPA for operating the Voidscape universe over **voidscape-server’s HTTP admin API** only (no direct database access).
+Internal React SPA for operating the Voidscape universe over **voidscape-server’s HTTP management API** only (no direct database access).
 
 ## Stack
 
@@ -29,7 +29,7 @@ Default API URL in `.env.example` is `http://127.0.0.1:8080`, matching the dev c
 
 ## Security
 
-This UI is meant for **trusted networks** (VPN, admin-only hosts). The server’s admin HTTP API should not be exposed publicly; only gRPC is intended for public exposure in production. Application-level auth is out of scope for this slice—rely on network controls or add API auth later.
+This UI is meant for **trusted networks** (VPN, operations-only hosts). The server’s management HTTP API should not be exposed publicly; only gRPC is intended for public exposure in production. Application-level auth is out of scope for this slice—rely on network controls or add API auth later.
 
 ## Build
 

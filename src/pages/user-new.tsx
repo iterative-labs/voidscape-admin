@@ -38,7 +38,7 @@ export function UserNewPage() {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">New user</h1>
         <p className="text-muted-foreground text-sm">
-          Creates a user via POST /admin/users.
+          Creates a user via POST /users.
         </p>
       </div>
       <Card className="max-w-md">

@@ -22,7 +22,7 @@ export function DashboardPage() {
         <CardHeader>
           <CardTitle>Active users & accounts</CardTitle>
           <CardDescription>
-            Rows with status active and not soft-deleted (admin view).
+            Rows with status active and not soft-deleted (management view).
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-6 sm:grid-cols-2">
