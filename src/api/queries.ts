@@ -1,17 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiFetch } from '@/api/client'
-import type { AdminStats, CreateUserInput, User, UserDetail } from '@/api/types'
+import type { CreateUserInput, StatsSummary, User, UserDetail } from '@/api/types'
 
 export const queryKeys = {
-  stats: ['management', 'stats'] as const,
-  users: ['management', 'users'] as const,
-  user: (id: string) => ['management', 'users', id] as const,
+  stats: ['server', 'stats'] as const,
+  users: ['server', 'users'] as const,
+  user: (id: string) => ['server', 'users', id] as const,
 }
 
-export function useAdminStats() {
+export function useStatsSummary() {
   return useQuery({
     queryKey: queryKeys.stats,
-    queryFn: () => apiFetch<AdminStats>('/stats'),
+    queryFn: () => apiFetch<StatsSummary>('/stats'),
   })
 }
 

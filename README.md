@@ -1,6 +1,6 @@
 # Voidscape Admin
 
-Internal React SPA for operating the Voidscape universe over **voidscape-server’s HTTP management API** only (no direct database access).
+Internal React SPA for operating the Voidscape universe over **voidscape-server’s management API** only (no direct database access).
 
 ## Stack
 
@@ -14,7 +14,7 @@ Internal React SPA for operating the Voidscape universe over **voidscape-server�
 ```bash
 npm install
 cp .env.example .env
-# Point at your voidscape-server HTTP bind address (must be listed in server config admin_http.allowed_origins).
+# Point at your voidscape-server management API bind address (must be listed in server config admin_http.allowed_origins).
 ```
 
 ## Development
@@ -29,7 +29,7 @@ Default API URL in `.env.example` is `http://127.0.0.1:8080`, matching the dev c
 
 ## Security
 
-This UI is meant for **trusted networks** (VPN, operations-only hosts). The server’s management HTTP API should not be exposed publicly; only gRPC is intended for public exposure in production. Application-level auth is out of scope for this slice—rely on network controls or add API auth later.
+This UI is meant for **trusted networks** (VPN, operations-only hosts). The **management API** should not be exposed publicly; only gRPC is intended for public exposure in production. Application-level auth is out of scope for this slice—rely on network controls or add API auth later.
 
 ## Build
 

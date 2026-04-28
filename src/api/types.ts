@@ -3,7 +3,8 @@ export type UserStatus = 'active' | 'inactive'
 export type GameAccountType = 'regular'
 export type GameAccountStatus = 'active' | 'inactive'
 
-export interface AdminStats {
+/** Response body from the management API GET /stats */
+export interface StatsSummary {
   active_users_total: number
   active_accounts_total: number
 }
