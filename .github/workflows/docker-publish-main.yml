@@ -1,0 +1,19 @@
+name: Publish Docker image (main)
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: docker-publish-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    uses: ./.github/workflows/docker-build-reusable.yml
+    with:
+      push: true

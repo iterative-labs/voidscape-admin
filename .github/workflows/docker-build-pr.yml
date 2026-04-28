@@ -1,0 +1,23 @@
+name: Docker build (PR)
+
+on:
+  pull_request:
+    paths:
+      - Dockerfile
+      - package.json
+      - package-lock.json
+      - src/**
+      - vite.config.ts
+      - tsconfig*.json
+      - index.html
+      - eslint.config.js
+      - .github/workflows/docker-build-pr.yml
+      - .github/workflows/docker-build-reusable.yml
+      - .github/workflows/docker-publish-main.yml
+
+permissions:
+  contents: read
+
+jobs:
+  docker:
+    uses: ./.github/workflows/docker-build-reusable.yml

@@ -1,0 +1,51 @@
+name: Docker image
+
+on:
+  workflow_call:
+    inputs:
+      push:
+        type: boolean
+        description: Push ghcr.io/<repository>:main after build
+        required: false
+        default: false
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        if: inputs.push
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push (main)
+        if: inputs.push
+        run: |
+          set -euo pipefail
+          docker buildx build \
+            --platform linux/amd64 \
+            --label org.opencontainers.image.source="https://github.com/${{ github.repository }}" \
+            --label org.opencontainers.image.revision="${{ github.sha }}" \
+            --tag "ghcr.io/${{ github.repository }}:main" \
+            --push \
+            .
+
+      - name: Build only (PR check)
+        if: ${{ inputs.push == false }}
+        run: |
+          set -euo pipefail
+          docker buildx build \
+            --platform linux/amd64 \
+            --label org.opencontainers.image.revision="${{ github.sha }}" \
+            --tag voidscape-admin:ci \
+            --load \
+            .
