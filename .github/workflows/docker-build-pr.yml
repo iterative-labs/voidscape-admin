@@ -6,9 +6,9 @@ on:
       - Dockerfile
       - package.json
       - package-lock.json
-      - src/**
+      - 'src/**'
       - vite.config.ts
-      - tsconfig*.json
+      - 'tsconfig*.json'
       - index.html
       - eslint.config.js
       - .github/workflows/docker-build-pr.yml
