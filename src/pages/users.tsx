@@ -29,6 +29,12 @@ export function UsersPage() {
   const pageSize = 50
   const q = useUsersList(pageSize, page * pageSize)
 
+  const rows = q.data?.users ?? []
+  const total = q.data?.total ?? 0
+  const totalPages = Math.max(1, Math.ceil(total / pageSize))
+  const rangeStart = total === 0 ? 0 : page * pageSize + 1
+  const rangeEnd = Math.min(total, page * pageSize + rows.length)
+
   const columns = useMemo(
     () => [
       columnHelper.accessor('username', {
@@ -59,12 +65,15 @@ export function UsersPage() {
 
   // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table
   const table = useReactTable({
-    data: q.data ?? [],
+    data: rows,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
   })
+
+  const hasPrevPage = page > 0
+  const hasNextPage = (page + 1) * pageSize < total
 
   return (
     <div className="space-y-6">
@@ -72,7 +81,8 @@ export function UsersPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Users</h1>
           <p className="text-muted-foreground text-sm">
-            Sort and filter in the browser; paging uses API limit/offset.
+            Sort and filter in the browser; paging uses API limit/offset with
+            server total.
           </p>
         </div>
         <Button asChild variant="outline">
@@ -155,24 +165,27 @@ export function UsersPage() {
               </TableBody>
             </Table>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-3">
             <Button
               type="button"
               variant="outline"
               size="sm"
-              disabled={page === 0}
+              disabled={!hasPrevPage}
               onClick={() => setPage((p) => Math.max(0, p - 1))}
             >
               Previous
             </Button>
             <span className="text-muted-foreground text-sm">
-              Page {page + 1}
+              Page {page + 1} of {totalPages}
+              {total > 0
+                ? ` · rows ${rangeStart}–${rangeEnd} of ${total}`
+                : ''}
             </span>
             <Button
               type="button"
               variant="outline"
               size="sm"
-              disabled={(q.data?.length ?? 0) < pageSize}
+              disabled={!hasNextPage}
               onClick={() => setPage((p) => p + 1)}
             >
               Next

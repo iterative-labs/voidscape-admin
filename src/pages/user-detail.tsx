@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
-import { useUser } from '@/api/queries'
+import { useAccountsForUser, useUser } from '@/api/queries'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -9,10 +9,27 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+
+/** Product cap: a login never has more than this many game accounts. */
+const MAX_GAME_ACCOUNTS_PER_USER = 10
 
 export function UserDetailPage() {
   const { id } = useParams<{ id: string }>()
   const q = useUser(id)
+  const aq = useAccountsForUser(q.isSuccess ? id : undefined, {
+    limit: MAX_GAME_ACCOUNTS_PER_USER,
+    offset: 0,
+  })
+
+  const accountTotal = aq.data?.total ?? 0
 
   return (
     <div className="space-y-6">
@@ -33,32 +50,97 @@ export function UserDetailPage() {
         <p className="text-destructive text-sm">{q.error.message}</p>
       )}
       {q.isSuccess && (
-        <Card>
-          <CardHeader>
-            <CardTitle>{q.data.username}</CardTitle>
-            <CardDescription>{q.data.email}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            <div className="flex flex-wrap gap-2">
-              <span className="text-muted-foreground">Status</span>
-              <Badge variant="secondary">{q.data.status}</Badge>
-            </div>
-            <div>
-              <span className="text-muted-foreground">Created </span>
-              {new Date(q.data.created_at).toLocaleString()}
-            </div>
-            <div>
-              <span className="text-muted-foreground">Updated </span>
-              {new Date(q.data.updated_at).toLocaleString()}
-            </div>
-            {q.data.deleted_at && (
-              <div>
-                <span className="text-muted-foreground">Deleted </span>
-                {new Date(q.data.deleted_at).toLocaleString()}
+        <>
+          <Card>
+            <CardHeader>
+              <CardTitle>{q.data.username}</CardTitle>
+              <CardDescription>{q.data.email}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2 text-sm">
+              <div className="flex flex-wrap gap-2">
+                <span className="text-muted-foreground">Status</span>
+                <Badge variant="secondary">{q.data.status}</Badge>
               </div>
-            )}
-          </CardContent>
-        </Card>
+              <div>
+                <span className="text-muted-foreground">Created </span>
+                {new Date(q.data.created_at).toLocaleString()}
+              </div>
+              <div>
+                <span className="text-muted-foreground">Updated </span>
+                {new Date(q.data.updated_at).toLocaleString()}
+              </div>
+              {q.data.deleted_at && (
+                <div>
+                  <span className="text-muted-foreground">Deleted </span>
+                  {new Date(q.data.deleted_at).toLocaleString()}
+                </div>
+              )}
+              <div>
+                <span className="text-muted-foreground">Account IDs </span>
+                <span className="font-mono text-xs">
+                  {q.data.account_ids.length === 0
+                    ? 'none'
+                    : `${q.data.account_ids.length} id(s): ${q.data.account_ids.join(', ')}`}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Game accounts</CardTitle>
+              <CardDescription>
+                Up to {MAX_GAME_ACCOUNTS_PER_USER} per login. Same data as GET
+                /accounts with optional <code className="text-xs">user_id</code>{' '}
+                filter.
+                {accountTotal > 0 ? ` ${accountTotal} total.` : ''}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {aq.isLoading && (
+                <p className="text-muted-foreground text-sm">Loading…</p>
+              )}
+              {aq.isError && (
+                <p className="text-destructive text-sm">{aq.error.message}</p>
+              )}
+              {aq.isSuccess && aq.data.items.length === 0 ? (
+                <p className="text-muted-foreground text-sm">
+                  No game accounts yet.
+                </p>
+              ) : null}
+              {aq.isSuccess && aq.data.items.length > 0 ? (
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Family name</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Created</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {aq.data.items.map((a) => (
+                        <TableRow key={a.id}>
+                          <TableCell className="font-medium">
+                            {a.family_name}
+                          </TableCell>
+                          <TableCell>{a.account_type}</TableCell>
+                          <TableCell>
+                            <Badge variant="secondary">{a.status}</Badge>
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {new Date(a.created_at).toLocaleString()}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              ) : null}
+            </CardContent>
+          </Card>
+        </>
       )}
     </div>
   )

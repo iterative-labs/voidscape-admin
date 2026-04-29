@@ -1,4 +1,4 @@
-import { useAdminStats } from '@/api/queries'
+import { useStatsSummary } from '@/api/queries'
 import {
   Card,
   CardContent,
@@ -8,21 +8,21 @@ import {
 } from '@/components/ui/card'
 
 export function DashboardPage() {
-  const q = useAdminStats()
+  const q = useStatsSummary()
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground text-sm">
-          Read-only stats from voidscape-server.
+          Read-only stats from the voidscape-server management API.
         </p>
       </div>
       <Card>
         <CardHeader>
           <CardTitle>Active users & accounts</CardTitle>
           <CardDescription>
-            Rows with status active and not soft-deleted (admin view).
+            Rows with status active and not soft-deleted (same filters as the management API GET /stats).
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-6 sm:grid-cols-2">
