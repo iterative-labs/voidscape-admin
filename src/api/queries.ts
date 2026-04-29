@@ -13,7 +13,7 @@ export const queryKeys = {
   stats: ['server', 'stats'] as const,
   users: ['server', 'users'] as const,
   user: (id: string) => ['server', 'users', id] as const,
-  accountsForUser: (userId: string, limit: number, offset: number) =>
+  accounts: (userId: string | null, limit: number, offset: number) =>
     ['server', 'accounts', { userId, limit, offset }] as const,
 }
 
@@ -42,17 +42,35 @@ export function useUser(id: string | undefined) {
   })
 }
 
+export function useAccountsList(options: {
+  userId?: string | null
+  limit: number
+  offset: number
+  enabled?: boolean
+}) {
+  const { userId, limit, offset, enabled = true } = options
+  return useQuery({
+    queryKey: queryKeys.accounts(userId ?? null, limit, offset),
+    queryFn: () => {
+      const p = new URLSearchParams()
+      p.set('limit', String(limit))
+      p.set('offset', String(offset))
+      if (userId) p.set('user_id', userId)
+      return apiFetch<AccountsListResult>(`/accounts?${p.toString()}`)
+    },
+    enabled,
+  })
+}
+
 export function useAccountsForUser(
   userId: string | undefined,
   options: { limit: number; offset: number },
 ) {
   const { limit, offset } = options
-  return useQuery({
-    queryKey: queryKeys.accountsForUser(userId ?? '', limit, offset),
-    queryFn: () =>
-      apiFetch<AccountsListResult>(
-        `/accounts?user_id=${encodeURIComponent(userId!)}&limit=${encodeURIComponent(String(limit))}&offset=${encodeURIComponent(String(offset))}`,
-      ),
+  return useAccountsList({
+    userId: userId ?? null,
+    limit,
+    offset,
     enabled: Boolean(userId),
   })
 }

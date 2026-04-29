@@ -27,6 +27,8 @@ export interface UsersListResult {
 
 export interface GameAccount {
   id: string
+  /** Login user that owns this game account */
+  user_id: string
   family_name: string
   account_type: GameAccountType
   status: GameAccountStatus
@@ -34,7 +36,7 @@ export interface GameAccount {
   updated_at: string
 }
 
-/** GET /accounts?user_id=… paginated response */
+/** GET /accounts (optional `user_id` filter) paginated response */
 export interface AccountsListResult {
   items: GameAccount[]
   total: number

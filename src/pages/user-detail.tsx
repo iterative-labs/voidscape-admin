@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useAccountsForUser, useUser } from '@/api/queries'
 import { Badge } from '@/components/ui/badge'
@@ -19,36 +18,18 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-const ACCOUNT_PAGE_SIZE = 25
+/** Product cap: a login never has more than this many game accounts. */
+const MAX_GAME_ACCOUNTS_PER_USER = 10
 
 export function UserDetailPage() {
   const { id } = useParams<{ id: string }>()
   const q = useUser(id)
-  const [accountPage, setAccountPage] = useState(0)
-
-  useEffect(() => {
-    setAccountPage(0)
-  }, [id])
-  const offset = accountPage * ACCOUNT_PAGE_SIZE
   const aq = useAccountsForUser(q.isSuccess ? id : undefined, {
-    limit: ACCOUNT_PAGE_SIZE,
-    offset,
+    limit: MAX_GAME_ACCOUNTS_PER_USER,
+    offset: 0,
   })
 
   const accountTotal = aq.data?.total ?? 0
-  const accountTotalPages = Math.max(
-    1,
-    Math.ceil(accountTotal / ACCOUNT_PAGE_SIZE),
-  )
-  const accountRangeStart =
-    accountTotal === 0 ? 0 : offset + 1
-  const accountRangeEnd = Math.min(
-    accountTotal,
-    offset + (aq.data?.items.length ?? 0),
-  )
-  const hasPrevAccounts = accountPage > 0
-  const hasNextAccounts =
-    (accountPage + 1) * ACCOUNT_PAGE_SIZE < accountTotal
 
   return (
     <div className="space-y-6">
@@ -109,8 +90,10 @@ export function UserDetailPage() {
             <CardHeader>
               <CardTitle>Game accounts</CardTitle>
               <CardDescription>
-                GET /accounts?user_id=… with server-side paging (
-                {accountTotal} total).
+                Up to {MAX_GAME_ACCOUNTS_PER_USER} per login. Same data as GET
+                /accounts with optional <code className="text-xs">user_id</code>{' '}
+                filter.
+                {accountTotal > 0 ? ` ${accountTotal} total.` : ''}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -153,36 +136,6 @@ export function UserDetailPage() {
                       ))}
                     </TableBody>
                   </Table>
-                </div>
-              ) : null}
-              {aq.isSuccess && accountTotal > 0 ? (
-                <div className="flex flex-wrap items-center gap-3">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    disabled={!hasPrevAccounts}
-                    onClick={() =>
-                      setAccountPage((p) => Math.max(0, p - 1))
-                    }
-                  >
-                    Previous
-                  </Button>
-                  <span className="text-muted-foreground text-sm">
-                    Page {accountPage + 1} of {accountTotalPages}
-                    {accountTotal > 0
-                      ? ` · rows ${accountRangeStart}–${accountRangeEnd} of ${accountTotal}`
-                      : ''}
-                  </span>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    disabled={!hasNextAccounts}
-                    onClick={() => setAccountPage((p) => p + 1)}
-                  >
-                    Next
-                  </Button>
                 </div>
               ) : null}
             </CardContent>
