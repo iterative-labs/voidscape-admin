@@ -19,6 +19,12 @@ export interface User {
   deleted_at: string | null
 }
 
+/** GET /users paginated response */
+export interface UsersListResult {
+  users: User[]
+  total: number
+}
+
 export interface GameAccount {
   id: string
   family_name: string
@@ -28,8 +34,15 @@ export interface GameAccount {
   updated_at: string
 }
 
+/** GET /accounts?user_id=… paginated response */
+export interface AccountsListResult {
+  items: GameAccount[]
+  total: number
+}
+
 export interface UserDetail extends User {
-  accounts: GameAccount[]
+  /** Non-deleted game account IDs for this login */
+  account_ids: string[]
 }
 
 export interface CreateUserInput {

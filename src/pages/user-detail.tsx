@@ -1,5 +1,6 @@
+import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { useUser } from '@/api/queries'
+import { useAccountsForUser, useUser } from '@/api/queries'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -18,9 +19,36 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
+const ACCOUNT_PAGE_SIZE = 25
+
 export function UserDetailPage() {
   const { id } = useParams<{ id: string }>()
   const q = useUser(id)
+  const [accountPage, setAccountPage] = useState(0)
+
+  useEffect(() => {
+    setAccountPage(0)
+  }, [id])
+  const offset = accountPage * ACCOUNT_PAGE_SIZE
+  const aq = useAccountsForUser(q.isSuccess ? id : undefined, {
+    limit: ACCOUNT_PAGE_SIZE,
+    offset,
+  })
+
+  const accountTotal = aq.data?.total ?? 0
+  const accountTotalPages = Math.max(
+    1,
+    Math.ceil(accountTotal / ACCOUNT_PAGE_SIZE),
+  )
+  const accountRangeStart =
+    accountTotal === 0 ? 0 : offset + 1
+  const accountRangeEnd = Math.min(
+    accountTotal,
+    offset + (aq.data?.items.length ?? 0),
+  )
+  const hasPrevAccounts = accountPage > 0
+  const hasNextAccounts =
+    (accountPage + 1) * ACCOUNT_PAGE_SIZE < accountTotal
 
   return (
     <div className="space-y-6">
@@ -66,6 +94,14 @@ export function UserDetailPage() {
                   {new Date(q.data.deleted_at).toLocaleString()}
                 </div>
               )}
+              <div>
+                <span className="text-muted-foreground">Account IDs </span>
+                <span className="font-mono text-xs">
+                  {q.data.account_ids.length === 0
+                    ? 'none'
+                    : `${q.data.account_ids.length} id(s): ${q.data.account_ids.join(', ')}`}
+                </span>
+              </div>
             </CardContent>
           </Card>
 
@@ -73,15 +109,23 @@ export function UserDetailPage() {
             <CardHeader>
               <CardTitle>Game accounts</CardTitle>
               <CardDescription>
-                In-game accounts linked to this login (non-deleted).
+                GET /accounts?user_id=… with server-side paging (
+                {accountTotal} total).
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              {q.data.accounts.length === 0 ? (
+            <CardContent className="space-y-4">
+              {aq.isLoading && (
+                <p className="text-muted-foreground text-sm">Loading…</p>
+              )}
+              {aq.isError && (
+                <p className="text-destructive text-sm">{aq.error.message}</p>
+              )}
+              {aq.isSuccess && aq.data.items.length === 0 ? (
                 <p className="text-muted-foreground text-sm">
                   No game accounts yet.
                 </p>
-              ) : (
+              ) : null}
+              {aq.isSuccess && aq.data.items.length > 0 ? (
                 <div className="rounded-md border">
                   <Table>
                     <TableHeader>
@@ -93,7 +137,7 @@ export function UserDetailPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {q.data.accounts.map((a) => (
+                      {aq.data.items.map((a) => (
                         <TableRow key={a.id}>
                           <TableCell className="font-medium">
                             {a.family_name}
@@ -110,7 +154,37 @@ export function UserDetailPage() {
                     </TableBody>
                   </Table>
                 </div>
-              )}
+              ) : null}
+              {aq.isSuccess && accountTotal > 0 ? (
+                <div className="flex flex-wrap items-center gap-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={!hasPrevAccounts}
+                    onClick={() =>
+                      setAccountPage((p) => Math.max(0, p - 1))
+                    }
+                  >
+                    Previous
+                  </Button>
+                  <span className="text-muted-foreground text-sm">
+                    Page {accountPage + 1} of {accountTotalPages}
+                    {accountTotal > 0
+                      ? ` · rows ${accountRangeStart}–${accountRangeEnd} of ${accountTotal}`
+                      : ''}
+                  </span>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={!hasNextAccounts}
+                    onClick={() => setAccountPage((p) => p + 1)}
+                  >
+                    Next
+                  </Button>
+                </div>
+              ) : null}
             </CardContent>
           </Card>
         </>
