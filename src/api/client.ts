@@ -1,22 +1,14 @@
-/** Management routes live at the server HTTP origin (`/stats`, `/users`, …), not under `/admin`. */
-export function getApiBaseUrl(): string {
-  const base = import.meta.env.VITE_API_BASE_URL
-  if (typeof base !== 'string' || !base.trim()) {
-    throw new Error('VITE_API_BASE_URL is not set (copy .env.example to .env)')
-  }
-  const trimmed = base.trim().replace(/\/$/, '')
-  try {
-    return new URL(trimmed).origin
-  } catch {
-    return trimmed
-  }
-}
+/** Base path for management API calls.
+ *  Default "/management-api" routes through the Vite dev proxy (see vite.config.ts).
+ *  Set VITE_API_BASE_PATH to a full URL to bypass the proxy (requires CORS on the server). */
+const API_BASE = (import.meta.env.VITE_API_BASE_PATH as string | undefined)?.replace(/\/$/, '')
+  ?? '/management-api'
 
 export async function apiFetch<T>(
   path: string,
   init?: RequestInit,
 ): Promise<T> {
-  const url = `${getApiBaseUrl()}${path.startsWith('/') ? path : `/${path}`}`
+  const url = `${API_BASE}${path.startsWith('/') ? path : `/${path}`}`
   const res = await fetch(url, {
     ...init,
     headers: {

@@ -1,4 +1,5 @@
-# Vite dev server for local / dev-env compose (browser talks to API on host-published ports).
+# Vite dev server for local / dev-env compose.
+# API calls are proxied via Vite to the backend (see vite.config.ts).
 FROM node:22-bookworm-slim
 
 WORKDIR /app
@@ -7,8 +8,6 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
-
-ENV VITE_API_BASE_URL=http://127.0.0.1:8080
 
 EXPOSE 5173
 
