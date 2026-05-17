@@ -25,7 +25,7 @@ With [voidscape-server](../voidscape-server) running and Postgres available per 
 npm run dev
 ```
 
-Default API URL in `.env.example` is `http://127.0.0.1:8080`, matching the dev config’s `network.http_addr`.
+API calls are proxied through the Vite dev server. Set `API_PROXY_TARGET` in `.env` to point at the backend (default: `http://server.vs.orb.local:8080`). The browser always calls `/management-api/*`; the proxy strips the prefix and forwards to the target.
 
 ## Security
 
@@ -55,4 +55,4 @@ Build locally from this repo root:
 DOCKER_BUILDKIT=1 docker buildx build -t voidscape-admin:local .
 ```
 
-The image runs Vite dev server on **`0.0.0.0:5173`** with `VITE_API_BASE_URL=http://127.0.0.1:8080` (browser → server on the host).
+The image runs the Vite dev server on **`0.0.0.0:5173`**. API calls are proxied via Vite: the browser calls `/management-api/*`, the proxy strips the prefix and forwards to `API_PROXY_TARGET` (default: `http://server:8080`, matching the Docker Compose service name). No hostname is baked into the image.
